@@ -56,9 +56,11 @@ type Direction struct {
 	Spaces    int
 }
 
+// aim is used only for part 2
 type Position struct {
-	X int
-	Y int
+	X   int
+	Y   int
+	Aim int
 }
 
 func ReadInput(c chan<- Direction, r io.Reader) {
@@ -93,8 +95,9 @@ func ReadInput(c chan<- Direction, r io.Reader) {
 	close(c)
 }
 
+// process input for part 1
 func ProcessInput(c <-chan Direction) Position {
-	p := Position{0, 0}
+	p := Position{0, 0, 0}
 	for dir := range c {
 		switch dir.Direction {
 		case Forward:
@@ -109,20 +112,51 @@ func ProcessInput(c <-chan Direction) Position {
 	return p
 }
 
-func ScanFile(file string) {
+// day2 process input
+func ProcessInput2(c <-chan Direction) Position {
+	p := Position{0, 0, 0}
+	for dir := range c {
+		switch dir.Direction {
+		case Forward:
+			p.X += dir.Spaces
+			p.Y = p.Y + (p.Aim * dir.Spaces)
+		case Down:
+			p.Aim += dir.Spaces
+		case Up:
+			p.Aim -= dir.Spaces
+		}
+	}
+
+	return p
+}
+
+// scan file and find puzzle answer
+// when aim is true, do part 2 puzzle input
+func ScanFile(file string, aim bool) {
 	c := make(chan Direction)
+	var pos Position
+
 	f, err := os.Open(file)
 	if err != nil {
 		panic(err)
 	}
 
 	go ReadInput(c, f)
-	pos := ProcessInput(c)
+
+	if aim {
+		pos = ProcessInput2(c)
+
+	} else {
+		pos = ProcessInput(c)
+	}
+
 	fmt.Printf("range: %d depth: %d\n", pos.X, pos.Y)
 	fmt.Printf("multiplicand: %d\n", pos.X*pos.Y)
 }
 
 func main() {
-	ScanFile("sample.txt")
-	ScanFile("input.txt")
+	ScanFile("sample.txt", false)
+	ScanFile("input.txt", false)
+	ScanFile("sample.txt", true)
+	ScanFile("input.txt", true)
 }
