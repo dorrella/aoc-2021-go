@@ -92,6 +92,7 @@ func ReadInput(c chan<- Direction, r io.Reader) {
 
 		c <- Direction{dir, spaces}
 	}
+
 	close(c)
 }
 
@@ -156,7 +157,12 @@ func ScanFile(file string, aim bool) {
 
 func main() {
 	ScanFile("sample.txt", false)
+	fmt.Println()
 	ScanFile("input.txt", false)
+	fmt.Println()
+
+	//part 2
 	ScanFile("sample.txt", true)
+	fmt.Println()
 	ScanFile("input.txt", true)
 }
