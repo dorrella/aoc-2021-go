@@ -108,7 +108,51 @@ func ProcessInput(c <-chan int) int {
 
 }
 
-func ScanFile(file string) {
+// using last 3 as sliding window
+func ProcessInput2(c <-chan int) int {
+	var count int = 0
+	var last_sum int = 0
+	var sum int = 0
+	last := [3]int{0, 0, 0}
+
+	for depth := range c {
+
+		last[0] = last[1]
+		last[1] = last[2]
+		last[2] = depth
+
+		//should only happen on first few
+		if last[0] == 0 {
+			continue
+		}
+
+		last_sum = sum
+		sum = last[0] + last[1] + last[2]
+
+		//skip first rolling widown
+		if last_sum == 0 {
+			fmt.Printf("%d (NA)\n", sum)
+			continue
+		}
+
+		if sum > last_sum {
+
+			count++
+			fmt.Printf("%d (increased)\n", sum)
+		} else {
+			//counts no change as decrease, but should be fine for this
+			fmt.Printf("%d (decreased)\n", sum)
+		}
+
+	}
+
+	return count
+
+}
+
+// Scans file and counts increases
+// uses rolling window when rw is true
+func ScanFile(file string, rw bool) {
 	f, err := os.Open(file)
 	if err != nil {
 		panic(err)
@@ -117,11 +161,25 @@ func ScanFile(file string) {
 	c := make(chan int)
 	go ReadInput(c, f)
 
-	count := ProcessInput(c)
+	var count int
+	if rw {
+		count = ProcessInput2(c)
+	} else {
+		count = ProcessInput(c)
+	}
+
 	fmt.Printf("file \"%s\" increased: %d times\n", file, count)
 }
 
 func main() {
-	ScanFile("sample.txt")
-	ScanFile("input.txt")
+	//no rolling window
+	ScanFile("sample.txt", false)
+	fmt.Println()
+	ScanFile("input.txt", false)
+	fmt.Println()
+
+	// rolling window
+	ScanFile("sample.txt", true)
+	fmt.Println()
+	ScanFile("input.txt", true)
 }
