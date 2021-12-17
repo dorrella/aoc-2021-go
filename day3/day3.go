@@ -43,72 +43,32 @@ import (
 	"strconv"
 )
 
-type BitCount struct {
-	Ones  int
-	Zeros int
-}
-
-type BitCounter struct {
-	Bits []BitCount
-}
-
-func (bc *BitCounter) Gamma() int64 {
-	bit_string := ""
-	for _, bit := range bc.Bits {
-		if bit.Ones > bit.Zeros {
-			bit_string = fmt.Sprintf("%s%c", bit_string, '1')
-		} else {
-			bit_string = fmt.Sprintf("%s%c", bit_string, '0')
-		}
-	}
-
-	ret, err := strconv.ParseInt(bit_string, 2, 64)
-	if err != nil {
-		panic("can't convert gamma to int")
-	}
-
-	return ret
-}
-
-func (bc *BitCounter) Epsilon() int64 {
-	bit_string := ""
-	for _, bit := range bc.Bits {
-		if bit.Ones < bit.Zeros {
-			bit_string = fmt.Sprintf("%s%c", bit_string, '1')
-		} else {
-			bit_string = fmt.Sprintf("%s%c", bit_string, '0')
-		}
-	}
-
-	ret, err := strconv.ParseInt(bit_string, 2, 64)
-	if err != nil {
-		panic("can't convert gamma to int")
-	}
-
-	return ret
-}
-
+//read from file and pass text over channel
 func ReadInput(c chan<- string, r io.Reader) {
 	scanner := bufio.NewScanner(r)
 	scanner.Split(bufio.ScanLines)
 
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
 		c <- scanner.Text()
 	}
 
 	close(c)
 }
 
-func ProcessInput(c <-chan string) BitCounter {
+//[]string is used for part 2
+func ProcessInput(c <-chan string) (BitCounter, []string) {
 	bc := BitCounter{make([]BitCount, 0)}
+	out := make([]string, 0)
 
 	for line := range c {
-		fmt.Println(line)
+		out = append(out, line)
+
+		//set bitcount to correct length, initializing all to zero
 		if len(line) > len(bc.Bits) {
 			bc.Bits = make([]BitCount, len(line))
 		}
 
+		//count values for epsilon/gamma
 		for i, bit := range line {
 			switch bit {
 			case '0':
@@ -120,13 +80,95 @@ func ProcessInput(c <-chan string) BitCounter {
 			}
 		}
 	}
-	fmt.Println(bc)
-	return bc
+
+	return bc, out
 }
 
-// scan file and find puzzle answer
-// when aim is true, do part 2 puzzle input
-func ScanFile(file string, aim bool) {
+// part 2 process input
+// in list of string read from wherever
+// match is the string to match per the rules
+// place is the idividual place to match
+//
+// could be done faster by tracking number of matches
+func LifeSupport(in []string, match string, place int) (BitCounter, []string) {
+	bc := BitCounter{make([]BitCount, 0)}
+	out := make([]string, 0)
+
+	for _, line := range in {
+		//set bitcount to correct length, initializing all to zero
+		if len(line) > len(bc.Bits) {
+			bc.Bits = make([]BitCount, len(line))
+		}
+
+		if line[place] != match[place] {
+			continue
+		}
+
+		out = append(out, line)
+
+		//only count values for epsilon/gamma for taken lines
+		for i, bit := range line {
+			switch bit {
+			case '0':
+				bc.Bits[i].Zeros += 1
+			case '1':
+				bc.Bits[i].Ones += 1
+			default:
+				panic("bad input")
+			}
+		}
+	}
+
+	return bc, out
+}
+
+// filter for oxygen for part 2
+func GetOxygen(in []string, match string) int64 {
+	lines := in
+	place := 0
+	var bc BitCounter
+	match_str := match
+
+	// trust the input
+	for len(lines) > 1 {
+		bc, lines = LifeSupport(lines, match_str, place)
+		match_str = bc.GammaString()
+		place++
+	}
+
+	ret, err := strconv.ParseInt(lines[0], 2, 64)
+	if err != nil {
+		panic("can't convert gamma to int")
+	}
+
+	return ret
+}
+
+//filter for co2 for part2
+func GetCO2(in []string, match string) int64 {
+	lines := in
+	place := 0
+	var bc BitCounter
+	match_str := match
+
+	// trust the input
+	for len(lines) > 1 {
+		bc, lines = LifeSupport(lines, match_str, place)
+		match_str = bc.EpsilonString()
+		place++
+	}
+
+	//make is usable
+	ret, err := strconv.ParseInt(lines[0], 2, 64)
+	if err != nil {
+		panic("can't convert gamma to int")
+	}
+
+	return ret
+}
+
+// scan file and find puzzle answer part 1
+func GetPower(file string) {
 	c := make(chan string)
 	var bc BitCounter
 
@@ -137,26 +179,36 @@ func ScanFile(file string, aim bool) {
 
 	go ReadInput(c, f)
 
-	if aim {
-		//_ = ProcessInput2(c)
-
-	} else {
-		bc = ProcessInput(c)
-	}
+	bc, _ = ProcessInput(c)
 
 	fmt.Printf("power: %d\n", bc.Gamma()*bc.Epsilon())
 }
 
+// scan file and find puzzle answer part 1
+func PrintLifeSupport(file string) {
+	c := make(chan string)
+	var bc BitCounter
+
+	f, err := os.Open(file)
+	if err != nil {
+		panic(err)
+	}
+
+	go ReadInput(c, f)
+	bc, lines := ProcessInput(c)
+
+	oxygen := GetOxygen(lines, bc.GammaString())
+	carbon := GetCO2(lines, bc.EpsilonString())
+
+	fmt.Printf("life support: %d\n", oxygen*carbon)
+}
+
 func main() {
-	ScanFile("sample.txt", false)
-	fmt.Println()
-	ScanFile("input.txt", false)
+	GetPower("sample.txt")
+	PrintLifeSupport("sample.txt")
 	fmt.Println()
 
-	/*
-		//part 2
-		ScanFile("sample.txt", true)
-		fmt.Println()
-		ScanFile("input.txt", true)
-	*/
+	GetPower("input.txt")
+	PrintLifeSupport("input.txt")
+
 }
