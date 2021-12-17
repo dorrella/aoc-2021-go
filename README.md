@@ -1,2 +1,4 @@
 # aoc-2021-go
-Adent of Code 2021 Go
+Advent of Code 2021 written in Go
+
+https://adventofcode.com/2021
