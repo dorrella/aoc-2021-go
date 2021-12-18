@@ -8,12 +8,11 @@ import (
 
 // read file and return a list of Vectors
 func ReadInput(file string) []Vect {
+	var vects []Vect
 	f, err := os.Open(file)
 	if err != nil {
 		panic(err)
 	}
-
-	var vects []Vect
 
 	scanner := bufio.NewScanner(f)
 	scanner.Split(bufio.ScanLines)
