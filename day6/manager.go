@@ -4,11 +4,12 @@ import (
 	"fmt"
 )
 
-// todo
+// wrapper for fish
 type FishManager struct {
 	fish []uint
 }
 
+//init manager using list of numbers
 func NewFishManager(fish []uint) *FishManager {
 	//needs 0-8, so size 9
 	fm := FishManager{make([]uint, 9)}
@@ -21,6 +22,7 @@ func NewFishManager(fish []uint) *FishManager {
 	return &fm
 }
 
+//step through a single day
 func (fm *FishManager) SimulateDay() {
 	// these will breed fish at 8 and reset to 6
 	breeders := fm.fish[0]
@@ -36,6 +38,7 @@ func (fm *FishManager) SimulateDay() {
 	fm.fish[6] += breeders
 }
 
+//part1 (and 2)
 func (fm *FishManager) Part1(days int) {
 	if days < 0 {
 		panic("bad days")
