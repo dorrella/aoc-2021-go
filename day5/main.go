@@ -2,10 +2,11 @@ package main
 
 import (
 	"bufio"
-	//"fmt"
+	"fmt"
 	"os"
 )
 
+// read file and return a list of Vectors
 func ReadInput(file string) []Vect {
 	f, err := os.Open(file)
 	if err != nil {
@@ -19,10 +20,7 @@ func ReadInput(file string) []Vect {
 
 	for scanner.Scan() {
 		text := scanner.Text()
-		v := NewVect(text)
-		if v.Direction != Invalid {
-			vects = append(vects, v)
-		}
+		vects = append(vects, NewVect(text))
 	}
 
 	return vects
@@ -30,11 +28,18 @@ func ReadInput(file string) []Vect {
 
 func main() {
 	//sample
-	vects := ReadInput("sample.txt")
+	sample_vects := ReadInput("sample.txt")
 	board := Board{}
-	board.Part1(vects)
-
-	vects = ReadInput("input.txt")
+	board.Part1(sample_vects)
 	board = Board{}
-	board.Part1(vects)
+	board.Part2(sample_vects)
+
+	fmt.Println()
+
+	//real input
+	real_vects := ReadInput("input.txt")
+	board = Board{}
+	board.Part1(real_vects)
+	board = Board{}
+	board.Part2(real_vects)
 }
