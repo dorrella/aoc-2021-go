@@ -31,10 +31,12 @@ func main() {
 	//sample
 	hm = ReadInput("sample.txt")
 	hm.Part1()
+	hm.Part2()
 
 	fmt.Println()
 
 	//real
 	hm = ReadInput("input.txt")
 	hm.Part1()
+	hm.Part2()
 }
