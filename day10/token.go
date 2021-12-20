@@ -25,6 +25,7 @@ var TokenMatches = map[Token]Token{
 	AngleClose:  AngleOpen,
 }
 
+//opening brackets
 func IsTokenOpen(token Token) bool {
 	l := []Token{ParenOpen, SquareOpen, CurlyOpen, AngleOpen}
 	for _, t := range l {
@@ -35,6 +36,7 @@ func IsTokenOpen(token Token) bool {
 	return false
 }
 
+//closing brackets
 func IsTokenClose(token Token) bool {
 	l := []Token{ParenClose, SquareClose, CurlyClose, AngleClose}
 	for _, t := range l {
@@ -45,6 +47,7 @@ func IsTokenClose(token Token) bool {
 	return false
 }
 
+//find complementary match
 func GetTokenMatch(t Token) Token {
 	for k, v := range TokenMatches {
 		if k == t {
@@ -54,6 +57,7 @@ func GetTokenMatch(t Token) Token {
 	panic("unknown token")
 }
 
+//generate score for part 1
 func ScoreToken(t Token) int {
 	switch t {
 	case ParenClose:
@@ -66,4 +70,28 @@ func ScoreToken(t Token) int {
 		return 25137
 	}
 	panic("extra corrupted")
+}
+
+//generate score for part 2
+func ScoreCompletion(s string) int {
+	sum := 0
+	for _, r := range s {
+		t := Token(r)
+		sum = sum * 5
+
+		switch t {
+		case ParenClose:
+			sum += 1
+		case SquareClose:
+			sum += 2
+		case CurlyClose:
+			sum += 3
+		case AngleClose:
+			sum += 4
+		default:
+			panic("bad completion string")
+		}
+	}
+
+	return sum
 }

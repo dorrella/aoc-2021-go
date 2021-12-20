@@ -30,12 +30,12 @@ func main() {
 	//sample
 	p = ReadInput("sample.txt")
 	p.Part1(false)
-	//p.Part2()
+	p.Part2(false)
 
 	fmt.Println()
 
 	//real
 	p = ReadInput("input.txt")
 	p.Part1(false)
-	//f.Part2()
+	p.Part2(false)
 }
