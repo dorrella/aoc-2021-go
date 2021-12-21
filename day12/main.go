@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 )
 
@@ -28,16 +29,22 @@ func main() {
 	//sample
 	g = ReadInput("sample.txt")
 	g.Part1()
+	g.Part2()
+
+	fmt.Println()
+
 	g = ReadInput("sample2.txt")
 	g.Part1()
+
+	fmt.Println()
+
 	g = ReadInput("sample3.txt")
 	g.Part1()
 
-	//fmt.Println()
+	fmt.Println()
 
 	//real
 	g = ReadInput("input.txt")
 	g.Part1()
-	//g = ReadInput("input.txt")
-	//g.Part2(false)
+	g.Part2()
 }
