@@ -90,12 +90,13 @@ func (p *Polymer) Step(in []rune) []rune {
 	return ret
 }
 
-func (p *Polymer) Part1(debug bool) {
+func (p *Polymer) Run(steps int, debug bool) {
 	in := []rune(p.Template)
 	if debug {
 		fmt.Printf("token: %s\n", string(in))
 	}
-	for i := 1; i <= 10; i++ {
+	for i := 1; i <= steps; i++ {
+		fmt.Println(i)
 		in = p.Step(in)
 		if debug {
 			fmt.Printf("step %d: %s\n", i, string(in))

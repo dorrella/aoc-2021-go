@@ -38,14 +38,15 @@ func main() {
 
 	//sample
 	p = ReadInput("sample.txt")
-	p.Part1(false)
+	p.Run(10, false)
+	p.Run(40, false)
 	//g.Part2()
 
 	fmt.Println()
 
 	//real
-	p = ReadInput("input.txt")
-	p.Part1(false)
+	//p = ReadInput("input.txt")
+	//p.Run(40, false)
 	//p.Part2()
 
 }
